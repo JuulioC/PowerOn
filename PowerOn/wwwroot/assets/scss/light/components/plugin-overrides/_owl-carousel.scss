@@ -4,16 +4,19 @@
     img {
         border-radius: 4px;
     }
+
     &.full-width {
         .owl-nav {
             position: absolute;
             top: 30%;
             width: 100%;
             margin-top: 0;
+
             .owl-prev,
             .owl-next {
                 background: transparent;
                 color: $white;
+
                 i {
                     &:before {
                         width: 60px;
@@ -26,17 +29,21 @@
                     }
                 }
             }
+
             .owl-prev {
                 float: left;
             }
+
             .owl-next {
                 float: right;
             }
         }
+
         .owl-dots {
             margin-top: 1rem;
         }
     }
+
     .item-video {
         width: 200px;
         height: 200px;

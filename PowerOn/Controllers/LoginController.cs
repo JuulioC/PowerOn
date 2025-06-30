@@ -1,52 +1,69 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PowerOn.Models; // Namespace do seu ViewModel
+using Microsoft.EntityFrameworkCore;
+using PowerOn.Data; // 1. Importar o namespace do seu DbContext
+using PowerOn.Models;
+using System.Linq; // 2. Importar o LINQ para fazer consultas
+using System.Threading.Tasks; // Para operações assíncronas (boa prática)
 
 namespace PowerOn.Controllers
 {
     public class LoginController : Controller
     {
+        // 3. Declarar uma variável para o DbContext
+        private readonly ApplicationDbContext _context;
+
+        // 4. Receber o DbContext no construtor (Injeção de Dependência)
+        public LoginController(ApplicationDbContext context)
+        {
+            _context = context; // O ASP.NET Core vai "injetar" o DbContext aqui automaticamente
+        }
+
         // GET: /Login
         // Esta action exibe a página de login
         [HttpGet]
         public IActionResult Index()
         {
-            // Retorna a View "Index.cshtml" que deve estar dentro da pasta "Views/Login"
             return View();
         }
 
         // POST: /Login
         // Esta action recebe os dados do formulário de login
         [HttpPost]
-        [ValidateAntiForgeryToken] // Proteção contra ataques CSRF
-        public IActionResult Index(LoginViewModel model)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Index(LoginViewModel model)
         {
-            // Verifica se o modelo de dados (usuário, senha) é válido
             if (ModelState.IsValid)
             {
-                // --- LÓGICA DE AUTENTICAÇÃO ---
-                // Aqui você deve verificar se o model.Email e model.Senha são válidos.
-                // Exemplo: consultar um banco de dados, chamar um serviço de identidade, etc.
+                // --- LÓGICA DE AUTENTICAÇÃO COM BANCO DE DADOS ---
 
-                // Exemplo de verificação simples (substitua pela sua lógica real):
-                if (model.Email == "usuario@poweron.com" && model.Senha == "senha123")
-                {
-                    // LÓGICA PÓS-LOGIN (Ex: Criar o Cookie de Autenticação)
-                    // ...
+                // 5. Busca no banco um usuário com o email fornecido que esteja ativo
+                var usuario = await _context.Usuarios
+                    .FirstOrDefaultAsync(u => u.Email == model.Email && u.Ativo == 1);
 
-                    // Redireciona para a página principal do sistema após o login bem-sucedido
-                    return RedirectToAction("Index", "Home"); // Redireciona para a Action "Index" do "HomeController"
-                }
-                else
+                // 6. Verifica se o usuário foi encontrado
+                if (usuario != null)
                 {
-                    // Se a autenticação falhar, adiciona uma mensagem de erro ao ModelState.
-                    // Isso será exibido na sua View.
-                    ModelState.AddModelError(string.Empty, "Credenciais inválidas. Tente novamente.");
-                    return View(model);
+                    // 7. ATENÇÃO: Verificação de senha (LEIA O AVISO ABAIXO)
+                    // Esta verificação é simples e compara a senha digitada com a que está no banco.
+                    // Em um projeto real, a senha NUNCA deve ser guardada como texto puro.
+                    // Você deve usar um algoritmo de HASH para salvar e verificar a senha.
+                    if (usuario.Senha == model.Password)
+                    {
+                        // LÓGICA PÓS-LOGIN (Ex: Criar o Cookie de Autenticação)
+                        // ... aqui você vai configurar a sessão do usuário ...
+
+                        // Redireciona para a página principal do sistema
+                        return RedirectToAction("Index", "Home");
+                    }
                 }
+
+                // Se o usuário não foi encontrado ou a senha está incorreta,
+                // a mensagem de erro é a mesma por segurança.
+                ModelState.AddModelError(string.Empty, "Email ou senha inválidos. Tente novamente.");
+                return View(model);
             }
 
-            // Se o ModelState não for válido (ex: campos em branco),
-            // retorna para a mesma view, exibindo as mensagens de erro de validação.
+            // Se o ModelState não for válido, retorna para a mesma view
             return View(model);
         }
     }

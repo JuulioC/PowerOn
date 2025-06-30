@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using PowerOn.Data; // Onde seu ApplicationDbContext está
 
 // Não precisa mais deste using, pois o controller é encontrado automaticamente
-// using PowerOn.Controllers; 
+// using PowerOn.Controllers;
 
 var builder = WebApplication.CreateBuilder(args);
 

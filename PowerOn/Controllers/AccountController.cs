@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PowerOn.Models;
-using System.Threading.Tasks;
 
 namespace PowerOn.Controllers
 {

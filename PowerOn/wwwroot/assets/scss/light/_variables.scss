@@ -14,29 +14,10 @@ $black: #000;
 $white: #ffffff;
 $white-smoke: #f2f7f8;
 $violet: #41478a;
-$darkslategray : #2e383e;
-$dodger-blue : #3498db;
+$darkslategray: #2e383e;
+$dodger-blue: #3498db;
 
-
-$colors: (
-  blue: $blue,
-  indigo: $indigo,
-  purple: $purple,
-  pink: $pink,
-  red: $red,
-  orange: $orange,
-  yellow: $yellow,
-  green: $green,
-  teal: $teal,
-  cyan: $cyan,
-  white: $white,
-  gray: #434a54,
-  gray-light: #aab2bd,
-  gray-lighter: #e8eff4,
-  gray-lightest: #e6e9ed,
-  gray-dark: #0f1531,
-  black: #000000
-);
+$colors: ( blue: $blue, indigo: $indigo, purple: $purple, pink: $pink, red: $red, orange: $orange, yellow: $yellow, green: $green, teal: $teal, cyan: $cyan, white: $white, gray: #434a54, gray-light: #aab2bd, gray-lighter: #e8eff4, gray-lightest: #e6e9ed, gray-dark: #0f1531, black: #000000 );
 
 $blue: $blue;
 $indigo: $indigo;
@@ -56,17 +37,7 @@ $gray-lightest: #e6e9ed;
 $gray-dark: #0f1531;
 $black: #000000;
 
-
-$theme-colors: (
-  primary: #b66dff,
-  secondary: #c3bdbd,
-  success: #1bcfb4,
-  info: #198ae3,
-  warning: #fed713,
-  danger: #fe7c96,
-  light: #f8f9fa,
-  dark: #3e4b5b
-);
+$theme-colors: ( primary: #b66dff, secondary: #c3bdbd, success: #1bcfb4, info: #198ae3, warning: #fed713, danger: #fe7c96, light: #f8f9fa, dark: #3e4b5b );
 
 $primary: #b66dff;
 $secondary: #c3bdbd;
@@ -77,15 +48,7 @@ $danger: #fe7c96;
 $light: #f8f9fa;
 $dark: #3e4b5b;
 
-$theme-gradient-colors: (primary: linear-gradient(to right, #da8cff, #9a55ff),
-secondary: linear-gradient(to right, #e7ebf0, #868e96),
-success: linear-gradient(to right, #84d9d2, #07cdae),
-info: linear-gradient(to right, #90caf9, #047edf 99%),
-warning: linear-gradient(to right, #f6e384, #ffd500),
-danger: linear-gradient(to right, #ffbf96, #fe7096),
-light: linear-gradient(to bottom, #f4f4f4, #e4e4e9),
-dark: linear-gradient(89deg, #5e7188, #3e4b5b));
-
+$theme-gradient-colors: (primary: linear-gradient(to right, #da8cff, #9a55ff), secondary: linear-gradient(to right, #e7ebf0, #868e96), success: linear-gradient(to right, #84d9d2, #07cdae), info: linear-gradient(to right, #90caf9, #047edf 99%), warning: linear-gradient(to right, #f6e384, #ffd500), danger: linear-gradient(to right, #ffbf96, #fe7096), light: linear-gradient(to bottom, #f4f4f4, #e4e4e9), dark: linear-gradient(89deg, #5e7188, #3e4b5b));
 
 ////////// COLOR SYSTEM //////////
 
@@ -94,36 +57,22 @@ $content-bg: #f2edf3;
 $footer-bg: $content-bg;
 $footer-color: color(dark);
 $border-color: #ebedf2;
-$circle-border:$white;
+$circle-border: $white;
 ////////// COLOR VARIABLES //////////
 
 ////////// SOCIAL COLORS //////////
 
-$social-colors: (twitter: #2caae1,
-facebook: #3b579d,
-google: #dc4a38,
-linkedin: #0177b5,
-pinterest: #cc2127,
-youtube: #e52d27,
-github: #333333,
-behance: #1769ff,
-dribbble: #ea4c89,
-reddit: #ff4500);
+$social-colors: (twitter: #2caae1, facebook: #3b579d, google: #dc4a38, linkedin: #0177b5, pinterest: #cc2127, youtube: #e52d27, github: #333333, behance: #1769ff, dribbble: #ea4c89, reddit: #ff4500);
 
 ////////// SOCIAL COLORS //////////
 
 ////////// FONTS//
-$type-1: 'roboto',
-sans-serif;
+$type-1: 'roboto', sans-serif;
 $type-2: $type-1;
-$type1-light: 'ubuntu-light',
-sans-serif;
-$type1-regular: 'ubuntu-regular',
-sans-serif;
-$type1-medium: 'ubuntu-medium',
-sans-serif;
-$type1-bold: 'ubuntu-bold',
-sans-serif;
+$type1-light: 'ubuntu-light', sans-serif;
+$type1-regular: 'ubuntu-regular', sans-serif;
+$type1-medium: 'ubuntu-medium', sans-serif;
+$type1-bold: 'ubuntu-bold', sans-serif;
 
 $default-font-size: .875rem; // 14px as base font size
 
@@ -137,7 +86,7 @@ $card-bg: #fff;
 $card-description-color: #76838f;
 $card-title-color: $body-color;
 $card-bg-varient: #fff;
-$card-grey:#dde1e1;
+$card-grey: #dde1e1;
 $card-banner: #f7e9cc;
 $card-blue: #b5d3f5;
 $card-blue-color: #075fa5;
@@ -162,12 +111,10 @@ $navbar-height: 70px;
 $navbar-menu-color: #9c9fa6;
 $navbar-font-size: .875rem;
 $navbar-icon-font-size: 1.25rem;
-$mail-head-bg:#303a40;
-$u-name-color:$black;
-$file-name:$black;
+$mail-head-bg: #303a40;
+$u-name-color: $black;
+$file-name: $black;
 ///////// NAVBAR ////////
-
-
 
 ///////// BUTTONS ////////
 
@@ -197,8 +144,6 @@ $btn-border-radius-lg: .1875rem;
 
 ///////// BUTTONS ////////
 
-
-
 ////////// TOOLTIP VARIABLES //////////
 
 //default styles
@@ -208,8 +153,6 @@ $tooltip-padding-x: .75rem;
 $tooltip-border-radius: .375rem;
 
 ////////// TOOLTIP VARIABLES //////////
-
-
 
 /////////  FORMS /////////
 
@@ -231,9 +174,9 @@ $input-padding-x-sm: .81rem;
 $input-padding-y-lg: .94rem;
 $input-padding-x-lg: 1.94rem;
 
-$input-height:          2.875rem;
-$input-height-sm:       2.575rem;
-$input-height-lg:       3.175rem;
+$input-height: 2.875rem;
+$input-height-sm: 2.575rem;
+$input-height-lg: 3.175rem;
 
 ///////// FORMS /////////
 
@@ -245,7 +188,6 @@ $dropdown-header-color: $body-color;
 $dropdown-menu-box-shadow: 0px 1px 15px 1px rgba(230, 234, 236, 0.35);
 $dropdown-hover-bg: #f8f9fa;
 ////////  DROPDOWNS ///////
-
 
 ////////// MEASUREMENT AND PROPERTY VARIABLES //////////
 
@@ -283,7 +225,6 @@ $breadcrumb-custom-item-color: $black;
 $breadcrumb-item-bg: #dbe3e6;
 ////////// BREAD CRUMBS VARIABLES //////////
 
-
 ////////// MODALS VARIABLES //////////
 $modal-inner-padding: .937rem;
 $modal-dialog-margin: 10px;
@@ -293,7 +234,7 @@ $modal-content-box-shadow-xs: 0 3px 9px rgba($black, .5);
 $modal-content-box-shadow-sm-up: 0 5px 15px rgba($black, .5);
 
 $modal-backdrop-bg: $black;
-$modal-backdrop-opacity: .5; 
+$modal-backdrop-opacity: .5;
 
 $modal-header-border-color: $border-color;
 $modal-content-border-color: $border-color;
@@ -330,27 +271,26 @@ $nav-tabs-link-active-border-color: $nav-tabs-border-color $nav-tabs-border-colo
 $nav-pills-custom-bg: #fcfcfd;
 ////////   TABS VARIABLES /////////
 $accent-color: $white;
-$chat-container-height:100%s;
-$text-gray:gray;
+$chat-container-height: 100%s;
+$text-gray: gray;
 $bullet-line-list-shape-bg: color(white) !default;
 $arrow-color: $white;
 $tab-head-bg: darken(#f2edf3, 2%);
-$accordian-shadow-color:rgba(230, 234, 236, 0.35);
-$landing-bg:#1a142dfa;
-$private-btn-bg:#eae2ec;
+$accordian-shadow-color: rgba(230, 234, 236, 0.35);
+$landing-bg: #1a142dfa;
+$private-btn-bg: #eae2ec;
 $circle-img-border: $white;
 $bottom-submenu-bg: $white;
 $chat-bottom-btn: $white;
-$form-focus-bg:$white;
 $form-focus-bg: $white;
-$form-focus-color:$black;
+$form-focus-bg: $white;
+$form-focus-color: $black;
 $landing-bg-color: $white;
 $mail-hover-color: rgba(240, 244, 249, 0.8);
 
 ///////// SETTINGS PANEL ////////
 $settings-panel-width: 300px;
 ///////// SETTINGS PANEL ////////
-
 
 ////////   CALENDAR  //////////////
 $fullcalendar-color: #a8b2b9;
@@ -363,4 +303,4 @@ $page-title-color: $body-color;
 $pro-banner: #000;
 $blue-teal-gradient: linear-gradient(to right, #da8cff, #9a55ff) !important;
 
-$buy-nowbanner-padding-top:70px;
+$buy-nowbanner-padding-top: 70px;
