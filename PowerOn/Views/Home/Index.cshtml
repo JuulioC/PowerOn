@@ -1,0 +1,100 @@
+﻿@{
+    ViewData["Title"] = "Agenda";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3 class="page-title mb-0">
+                        <span class="page-title-icon bg-gradient-primary text-white me-2">
+                            <i class="fas fa-calendar-days"></i>
+                        </span>
+                        Agenda
+                    </h3>
+                </div>
+                <hr class="my-4">
+                <form asp-action="Index" asp-controller="Home" method="get">
+                    <div class="row align-items-end">
+                        <div class="col-md-5">
+                            <div class="form-group">
+                                <label for="data-agendamento">Data</label>
+                                <input type="text" class="form-control" id="data-agendamento" name="DataAgendamento">
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="form-group">
+                                <label for="nome-consultor">Consultor</label>
+                                <input type="text" class="form-control" id="nome-consultor" value="@ViewData["NomeConsultor"]" disabled>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label class="text-white" style="visibility: hidden;">Buscar</label>
+                                <button type="submit" class="btn btn-gradient-primary w-100">Buscar</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <hr class="my-4">
+                <h4 class="card-title">Agendamentos</h4>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Cliente</th>
+                                <th>Placa</th>
+                                <th>Status</th>
+                                <th>Consultor</th>
+                                <th class="text-end">Atendimento</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Eren Yeagger</td>
+                                <td>ABC-1234</td>
+                                <td>
+                                    <label class="badge badge-gradient-success">CONFIRMADO</label>
+                                </td>
+                                <td>Felippe T.</td>
+                                <td class="text-end">
+                                    <a asp-controller="OrdemServico" asp-action="Detalhes" asp-route-id="123">OS-54321</a>
+                                </td>
+                            </tr>                            
+                            <tr>
+                                <td>Stella Johnson</td>
+                                <td>XYZ-8899</td>
+                                <td>
+                                    <label class="badge badge-gradient-warning">PENDENTE</label>
+                                </td>
+                                <td>Consultor E.</td>
+                                <td class="text-end">
+                                    <a asp-controller="OrdemServico" asp-action="Create" asp-route-agendamentoId="456" class="btn btn-sm btn-gradient-primary">
+                                        Iniciar Atendimento
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script>
+        $(document).ready(function(){
+
+            $('#data-agendamento').mask('00/00/0000');
+
+            var hoje = new Date();
+            var dia = String(hoje.getDate()).padStart(2, '0');
+            var mes = String(hoje.getMonth() + 1).padStart(2, '0');
+            var ano = hoje.getFullYear();
+            var dataFormatada = dia + '/' + mes + '/' + ano;
+
+            $('#data-agendamento').val(dataFormatada);
+        });
+    </script>
+}

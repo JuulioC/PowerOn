@@ -1,0 +1,33 @@
+﻿:root {
+    --cor-menu-principal: #9A55FF;
+}
+
+.sidebar .nav .nav-link .menu-icon,
+.sidebar .nav .nav-link .menu-arrow {
+    color: var(--cor-menu-principal) !important;
+    opacity: 1 !important;
+}
+
+.sidebar .nav .nav-link .menu-title,
+.sidebar .nav .nav-item.active > .nav-link .menu-title,
+.sidebar .nav .nav-link[aria-expanded="true"] .menu-title,
+.sidebar .nav .nav-link:hover .menu-title {
+    color: var(--cor-menu-principal) !important;
+    font-weight: 600 !important;
+    font-family: "Ubuntu", sans-serif !important;
+}
+
+/* ESTILOS PARA O CONTAINER DE FILTROS */
+.filter-container {
+    display: flex;
+    align-items: flex-end;
+    gap: 1rem;
+}
+
+.filter-item {
+    flex: 1;
+}
+
+.filter-item-button {
+    flex-basis: 15%;
+}

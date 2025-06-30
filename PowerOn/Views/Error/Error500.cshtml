@@ -1,0 +1,22 @@
+﻿@{
+    ViewData["Title"] = "Erro no Servidor";
+}
+
+<div class="container error-container text-center">
+    <div class="error-code">500</div>
+    <h1 class="error-message">Ocorreu um Erro Inesperado</h1>
+    <p class="lead text-muted">
+        Nossa equipe já foi notificada e está trabalhando para corrigir o problema.
+        <br />
+        Por favor, tente novamente mais tarde.
+    </p>
+    <a asp-controller="Home" asp-action="Index" class="btn btn-danger mt-4">Voltar para a Página Inicial</a>
+
+    @if (ViewBag.ShowErrorDetails == true && ViewBag.ErrorPath != null)
+    {
+        <div class="alert alert-danger mt-5 text-start">
+            <p><strong>Caminho do Erro:</strong> <code>@ViewBag.ErrorPath</code></p>
+            <p><strong>Mensagem:</strong> <code>@ViewBag.ErrorMessage</code></p>
+        </div>
+    }
+</div>
