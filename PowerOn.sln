@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36221.1 d17.14
+VisualStudioVersion = 17.14.36221.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PowerOn", "PowerOn\PowerOn.csproj", "{9F82130B-A0C0-4DA4-A970-3A79F80EFAFB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HashGeneratorConsole", "HashGeneratorConsole\HashGeneratorConsole.csproj", "{C8215CE6-8DBB-4D03-A3BE-ED088A62B50F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -18,6 +20,12 @@ Global
 		{9F82130B-A0C0-4DA4-A970-3A79F80EFAFB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9F82130B-A0C0-4DA4-A970-3A79F80EFAFB}.UI|Any CPU.ActiveCfg = UI|Any CPU
 		{9F82130B-A0C0-4DA4-A970-3A79F80EFAFB}.UI|Any CPU.Build.0 = UI|Any CPU
+		{C8215CE6-8DBB-4D03-A3BE-ED088A62B50F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C8215CE6-8DBB-4D03-A3BE-ED088A62B50F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C8215CE6-8DBB-4D03-A3BE-ED088A62B50F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C8215CE6-8DBB-4D03-A3BE-ED088A62B50F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C8215CE6-8DBB-4D03-A3BE-ED088A62B50F}.UI|Any CPU.ActiveCfg = Debug|Any CPU
+		{C8215CE6-8DBB-4D03-A3BE-ED088A62B50F}.UI|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

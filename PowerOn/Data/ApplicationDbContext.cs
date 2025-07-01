@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PowerOn.Models; // Garante que o DbContext enxergue todas as suas classes de modelo
+using PowerOn.Models;
 
 namespace PowerOn.Data
 {
@@ -9,22 +9,16 @@ namespace PowerOn.Data
             : base(options)
         {
         }
-
-        // --- Mapeamento das Tabelas para DbSets ---
-
-        // Tabelas Principais e de Ligação
         public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<Empresa> Empresas { get; set; }
         public DbSet<Produto> Produtos { get; set; }
         public DbSet<Pacote> Pacotes { get; set; }
-        public DbSet<PacoteProduto> PacoteProdutos { get; set; } // Tabela de ligação
-
-        // Tabelas relacionadas a Veículos
+        public DbSet<PacoteProduto> PacoteProdutos { get; set; }
         public DbSet<Marca> Marcas { get; set; }
         public DbSet<Familia> Familias { get; set; }
         public DbSet<Modelo> Modelos { get; set; }
         public DbSet<Revisao> Revisoes { get; set; }
-        public DbSet<Veiculo> Veiculos { get; set; } // Nome corrigido de Viculo
+        public DbSet<Veiculo> Veiculos { get; set; }
 
         // Tabelas relacionadas a Clientes
         public DbSet<Cliente> Clientes { get; set; }

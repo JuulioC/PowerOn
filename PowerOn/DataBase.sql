@@ -82,6 +82,7 @@ CREATE TABLE Usuario (
     EmpresaId INT,
     CodigoSistema VARCHAR(255),
     ImgPerfil LONGBLOB,
+    ImgPerfilMimeType VARCHAR(50),
     Ativo INT,
     UltimoAcesso DATETIME,
     FOREIGN KEY (EmpresaId) REFERENCES Empresa(Id)
@@ -160,4 +161,4 @@ VALUES('MAXMOBILITY','08.678.729/0001-23',0);
 
 -- Note que o ID da empresa será 1
 INSERT INTO Usuario (Nome, Email, Senha, Perfil, Ativo, EmpresaId)
-VALUES('mastermax', 'admin@emai.com', '78UeJiyW9pRK4NCxXN5zTg==', 0, 1, 1);
+VALUES('mastermax', 'admin@email.com', '$2a$11$l99463gn6YXJ/iG3.MOexO2xI.Op1GUDS/JXnecf.oaBssE1/XKDu', 0, 1, 1);

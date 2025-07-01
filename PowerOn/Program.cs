@@ -1,30 +1,34 @@
-// 1. ADICIONE ESTES USINGS IMPORTANTES
+// Usings necessários para o Program.cs
 using Microsoft.EntityFrameworkCore;
 using PowerOn.Data; // Onde seu ApplicationDbContext está
-
-// Não precisa mais deste using, pois o controller é encontrado automaticamente
-// using PowerOn.Controllers;
+using Microsoft.AspNetCore.Authentication.Cookies; // Necessário para a autenticação por cookies
+using Microsoft.AspNetCore.Authorization; // Necessário para UseAuthorization (embora não diretamente usado no Program.cs, é parte do stack)
 
 var builder = WebApplication.CreateBuilder(args);
 
 // --- INÍCIO DA CONFIGURAÇÃO DO BANCO DE DADOS ---
-
-// 2. Pega a Connection String do appsettings.json
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-
-// 3. Adiciona e configura o DbContext para usar MySQL
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
 );
-
 // --- FIM DA CONFIGURAÇÃO DO BANCO DE DADOS ---
 
-// Adiciona os serviços para Controllers e Views (isso você já tinha)
+// --- INÍCIO DA CONFIGURAÇÃO DA AUTENTICAÇÃO POR COOKIES ---
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Login";
+        options.AccessDeniedPath = "/Home/AccessDenied";
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+        options.SlidingExpiration = true;
+    });
+// --- FIM DA CONFIGURAÇÃO DA AUTENTICAÇÃO POR COOKIES ---
+
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Configure o pipeline de requisições HTTP.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
@@ -32,23 +36,22 @@ if (!app.Environment.IsDevelopment())
 }
 else
 {
-    // Esta é uma boa prática para ambientes de desenvolvimento
-    app.UseDeveloperExceptionPage();
+    app.UseDeveloperExceptionPage(); // ESSENCIAL PARA VER DETALHES DO ERRO
 }
 
-app.UseHttpsRedirection();
-app.UseStaticFiles();
+app.UseHttpsRedirection(); // Redireciona HTTP para HTTPS
+app.UseStaticFiles(); // Para servir CSS, JS, imagens
 app.UseRouting();
 
-// Middleware de autorização (importante para áreas logadas)
+// --- MIDDLEWARE DE AUTENTICAÇÃO E AUTORIZAÇÃO (ORDEM CRUCIAL) ---
+app.UseAuthentication(); // Deve vir ANTES de UseAuthorization
 app.UseAuthorization();
 
-// Rota para páginas de erro genéricas (isso você já tinha)
-app.UseStatusCodePagesWithReExecute("/Error/{0}");
+app.UseStatusCodePagesWithReExecute("/Error/{0}"); // Para páginas de erro genéricas
 
-// Sua rota padrão que direciona para a página de login
+// Sua rota padrão
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Account}/{action=Login}/{id?}");
+    pattern: "{controller=Login}/{action=Index}/{id?}"); // Redireciona para o LoginController
 
 app.Run();

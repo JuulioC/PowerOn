@@ -16,6 +16,8 @@ namespace PowerOn.Models
         public int? EmpresaId { get; set; }
         public string? CodigoSistema { get; set; }
         public byte[]? ImgPerfil { get; set; }
+        // *** MUDANÇA AQUI: Nova propriedade para armazenar o tipo MIME da imagem ***
+        public string? ImgPerfilMimeType { get; set; }
         public int? Ativo { get; set; }
         public DateTime? UltimoAcesso { get; set; }
 

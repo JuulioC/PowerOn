@@ -6,9 +6,8 @@ namespace PowerOn
     {
         public static string? GetVersion()
         {
-            return Assembly.GetEntryAssembly()?
-                           .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?
-                           .InformationalVersion;
+            return Assembly.GetEntryAssembly()?.GetName().Version?.ToString() ?? "0.0.0.0";
+
         }
     }
 }

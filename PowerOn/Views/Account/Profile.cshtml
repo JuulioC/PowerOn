@@ -1,0 +1,173 @@
+﻿@model PowerOn.Models.EditProfileViewModel
+@using System.Security.Claims
+@using PowerOn.Utils
+@{
+    ViewData["Title"] = "Meu Perfil";
+    Layout = "~/Views/Shared/_Layout.cshtml"; // Use seu layout padrão
+
+    // Obtém o perfil do usuário logado a partir das Claims
+    // Passado via ViewData do Controller para simplificar a lógica aqui
+    int currentUserProfileId = (int)(ViewData["CurrentUserProfileId"] ?? -1);
+
+    // Define quais perfis têm permissão para editar Perfil e EmpresaId
+    bool canEditRestrictedFields = currentUserProfileId == 0 || currentUserProfileId == 4; // MAXMOBILITY (0) ou ISOTECH (4)
+
+    // Define se o campo CodigoSistema pode ser editado (somente MAXMOBILITY e ISOTECH)
+    bool canEditCodigoSistema = currentUserProfileId == 0 || currentUserProfileId == 4;
+}
+
+<div class="col-12 grid-margin stretch-card">
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title">Editar Meu Perfil</h4>
+            <p class="card-description">Atualize suas informações de cadastro.</p>
+
+            <!-- Exibe mensagens de sucesso ou erro do TempData -->
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success" role="alert">
+                    @TempData["SuccessMessage"]
+                </div>
+            }
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger" role="alert">
+                    @TempData["ErrorMessage"]
+                </div>
+            }
+
+            <!-- Formulário de Edição de Perfil (adicionado enctype para upload de arquivo) -->
+            <form class="forms-sample" asp-controller="Account" asp-action="Profile" method="post" enctype="multipart/form-data">
+                <!-- Exibe mensagens de validação do modelo (erros gerais) -->
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <!-- Campo oculto para o ID do usuário -->
+                <input type="hidden" asp-for="Id" />
+
+                <!-- Imagem de Perfil Atual e Input para Nova Imagem -->
+                <div class="form-group text-center mb-4">
+                    <label for="newProfileImage" style="cursor: pointer;">
+                        Imagem de Perfil Atual
+                        <div class="nav-profile-img mx-auto" style="position: relative; width: 100px; height: 100px; border-radius: 50%; overflow: hidden;">
+                            @{
+                                string profileImageUrl = "/assets/images/UserImage.png"; // Imagem padrão
+                                if (!string.IsNullOrEmpty(Model.ImgPerfilBase64) && !string.IsNullOrEmpty(Model.ImgPerfilMimeType))
+                                {
+                                    profileImageUrl = $"data:{Model.ImgPerfilMimeType};base64,{Model.ImgPerfilBase64}";
+                                }
+                            }
+                            <img id="profilePreview" src="@profileImageUrl" alt="Imagem de Perfil" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+                            <div style="position: absolute; bottom: 0; right: 0; background-color: rgba(0,0,0,0.5); border-radius: 50%; padding: 5px;">
+                                <i class="fas fa-camera text-white"></i>
+                            </div>
+                        </div>
+                    </label>
+                    <small class="text-muted d-block">Clique na imagem para alterar.</small>
+                    <!-- Input de arquivo oculto -->
+                    <input type="file" id="newProfileImage" name="NewProfileImageFile" accept="image/*" style="display: none;" />
+                </div>
+
+                <!-- Campo Nome -->
+                <div class="form-group">
+                    <label asp-for="Nome"></label>
+                    <input asp-for="Nome" class="form-control" placeholder="Nome Completo">
+                    <span asp-validation-for="Nome" class="text-danger"></span>
+                </div>
+
+                <!-- Campo Email -->
+                <div class="form-group">
+                    <label asp-for="Email"></label>
+                    <input asp-for="Email" class="form-control" placeholder="Email">
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+
+                <!-- Campo Nova Senha (opcional) -->
+                <div class="form-group">
+                    <label asp-for="NewPassword"></label>
+                    <input asp-for="NewPassword" class="form-control" placeholder="Deixe em branco para não alterar">
+                    <span asp-validation-for="NewPassword" class="text-danger"></span>
+                </div>
+
+                <!-- Campo Confirmar Nova Senha (opcional) -->
+                <div class="form-group">
+                    <label asp-for="ConfirmNewPassword"></label>
+                    <input asp-for="ConfirmNewPassword" class="form-control" placeholder="Confirme a nova senha">
+                    <span asp-validation-for="ConfirmNewPassword" class="text-danger"></span>
+                </div>
+
+                <!-- Campo Perfil (Condicionalmente Editável) -->
+                <div class="form-group">
+                    <label asp-for="Perfil"></label>
+                    @if (canEditRestrictedFields)
+                    {
+                        <input asp-for="Perfil" class="form-control" placeholder="Perfil">
+                        <span asp-validation-for="Perfil" class="text-danger"></span>
+                    }
+                    else
+                    {
+                        <!-- Exibe o nome do perfil usando TiposEnum.EnumPerfil -->
+                        <p class="form-control-static">@TiposEnum.EnumPerfil(Model.Perfil ?? -1)</p>
+                        <input type="hidden" asp-for="Perfil" />
+
+                        <!-- Campo oculto para enviar o valor atual -->
+                    }
+                </div>
+
+                <!-- Campo EmpresaId (Condicionalmente Editável) -->
+                <div class="form-group">
+                    <label asp-for="EmpresaId"></label>
+                    @if (canEditRestrictedFields)
+                    {
+                        <input asp-for="EmpresaId" class="form-control" placeholder="ID da Empresa">
+                        <span asp-validation-for="EmpresaId" class="text-danger"></span>
+                    }
+                    else
+                    {
+                        <p class="form-control-static">@Model.EmpresaId</p>
+                        <input type="hidden" asp-for="EmpresaId" />
+
+                        <!-- Campo oculto para enviar o valor atual -->
+                    }
+                </div>
+
+                <!-- Campo CodigoSistema (Condicionalmente Editável/Somente Leitura) -->
+                <div class="form-group">
+                    <label asp-for="CodigoSistema"></label>
+                    @if (canEditCodigoSistema) // MAXMOBILITY (0) ou ISOTECH (4) podem editar
+                    {
+                        <input asp-for="CodigoSistema" class="form-control" placeholder="Código do Sistema">
+                        <span asp-validation-for="CodigoSistema" class="text-danger"></span>
+                    }
+                    else if (currentUserProfileId == 1 || currentUserProfileId == 2 || currentUserProfileId == 3) // CONSULTOR, GERENTE, ADMINISTRADOR podem VER (somente leitura)
+                    {
+                        <input asp-for="CodigoSistema" class="form-control" placeholder="Código do Sistema" readonly>
+                        <span asp-validation-for="CodigoSistema" class="text-danger"></span>
+                    }
+                    else // Outros perfis que não devem ver o campo
+                    {
+                        <!-- Não exibe o campo, mas envia o valor oculto para o POST -->
+                        <input type="hidden" asp-for="CodigoSistema" />
+                    }
+                </div>
+
+
+                <button type="submit" class="btn btn-gradient-primary me-2">Atualizar Perfil</button>
+                <a asp-controller="Home" asp-action="Index" class="btn btn-light">Cancelar</a>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" /> <!-- Necessário para validação no lado do cliente -->
+
+    <script>
+        // Script para pré-visualizar a imagem selecionada
+        document.getElementById('newProfileImage').addEventListener('change', function(event) {
+            const [file] = event.target.files;
+            if (file) {
+                document.getElementById('profilePreview').src = URL.createObjectURL(file);
+            }
+        });
+    </script>
+}

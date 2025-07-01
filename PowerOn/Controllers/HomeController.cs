@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
-using PowerOn.Models;
 using System.Diagnostics;
+using Microsoft.AspNetCore.Authorization; // Necessário para o atributo [Authorize]
+using PowerOn.Models; // Necessário para ErrorViewModel
 
 namespace PowerOn.Controllers
 {
+    [Authorize] // Garante que apenas usuários autenticados possam acessar este controller
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -15,8 +17,11 @@ namespace PowerOn.Controllers
 
         public IActionResult Index()
         {
+            // Você pode acessar informações do usuário logado aqui, se necessário
+            // Por exemplo: string userName = User.Identity.Name;
+
             ViewData["NomeConsultor"] = "Felippe Toledo";
-            return View();
+            return View(); // Retorna a View padrão (Home/Index.cshtml)
         }
 
         public IActionResult Privacy()

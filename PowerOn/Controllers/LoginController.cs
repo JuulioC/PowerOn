@@ -1,70 +1,94 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using PowerOn.Data; // 1. Importar o namespace do seu DbContext
-using PowerOn.Models;
-using System.Linq; // 2. Importar o LINQ para fazer consultas
-using System.Threading.Tasks; // Para operações assíncronas (boa prática)
+using Microsoft.EntityFrameworkCore; // Necessário para DbContext
+using PowerOn.Data; // Importa o namespace do seu DbContext
+using PowerOn.Models; // Importa o namespace dos seus modelos (Usuario, LoginViewModel)
+using System.Linq;
+using System.Threading.Tasks;
+using System.Security.Claims; // Necessário para criar Claims para autenticação
+using Microsoft.AspNetCore.Authentication; // Necessário para HttpContext.SignInAsync
+using Microsoft.AspNetCore.Authentication.Cookies; // Necessário para CookieAuthenticationDefaults
+using PowerOn.Utils; // Necessário para PasswordHasher
+using System; // Necessário para Exception
 
 namespace PowerOn.Controllers
 {
     public class LoginController : Controller
     {
-        // 3. Declarar uma variável para o DbContext
         private readonly ApplicationDbContext _context;
 
-        // 4. Receber o DbContext no construtor (Injeção de Dependência)
         public LoginController(ApplicationDbContext context)
         {
-            _context = context; // O ASP.NET Core vai "injetar" o DbContext aqui automaticamente
+            _context = context;
         }
 
-        // GET: /Login
-        // Esta action exibe a página de login
         [HttpGet]
         public IActionResult Index()
         {
-            return View();
+            return View("~/Views/Account/Login.cshtml");
         }
 
-        // POST: /Login
-        // Esta action recebe os dados do formulário de login
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Index(LoginViewModel model)
         {
             if (ModelState.IsValid)
             {
-                // --- LÓGICA DE AUTENTICAÇÃO COM BANCO DE DADOS ---
-
-                // 5. Busca no banco um usuário com o email fornecido que esteja ativo
                 var usuario = await _context.Usuarios
-                    .FirstOrDefaultAsync(u => u.Email == model.Email && u.Ativo == 1);
+                    .FirstOrDefaultAsync(u => u.Email == model.Email);
 
-                // 6. Verifica se o usuário foi encontrado
-                if (usuario != null)
+                if (usuario != null && usuario.Senha != null && PasswordHasher.VerifyPassword(model.Password, usuario.Senha))
                 {
-                    // 7. ATENÇÃO: Verificação de senha (LEIA O AVISO ABAIXO)
-                    // Esta verificação é simples e compara a senha digitada com a que está no banco.
-                    // Em um projeto real, a senha NUNCA deve ser guardada como texto puro.
-                    // Você deve usar um algoritmo de HASH para salvar e verificar a senha.
-                    if (usuario.Senha == model.Password)
+                    // Claims completas.
+                    var claims = new List<Claim>
                     {
-                        // LÓGICA PÓS-LOGIN (Ex: Criar o Cookie de Autenticação)
-                        // ... aqui você vai configurar a sessão do usuário ...
+                        new Claim(ClaimTypes.NameIdentifier, usuario.Id.ToString()),
+                        new Claim(ClaimTypes.Name, usuario.Nome ?? usuario.Email),
+                        new Claim(ClaimTypes.Role, usuario.Perfil?.ToString() ?? ""), // Garante que Perfil não é nulo
+                        new Claim("EmpresaId", usuario.EmpresaId?.ToString() ?? ""), // Garante que EmpresaId não é nulo
+                        new Claim("CodigoSistema", usuario.CodigoSistema ?? "")
+                    };
 
-                        // Redireciona para a página principal do sistema
+                    // Lógica para a claim da imagem de perfil, garantindo que ela SEMPRE seja adicionada, mesmo que vazia.
+                    string imgBase64 = "";
+                    if (usuario.ImgPerfil != null && usuario.ImgPerfil.Length > 0)
+                    {
+                        imgBase64 = Convert.ToBase64String(usuario.ImgPerfil);
+                    }
+                    claims.Add(new Claim("ImgPerfilBase64", imgBase64));
+                    claims.Add(new Claim("ImgPerfilMimeType", usuario.ImgPerfilMimeType ?? ""));
+
+
+                    var claimsIdentity = new ClaimsIdentity(
+                        claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+                    var authProperties = new AuthenticationProperties
+                    {
+                        IsPersistent = false,
+                        ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(30)
+                    };
+
+                    try
+                    {
+                        await HttpContext.SignInAsync(
+                            CookieAuthenticationDefaults.AuthenticationScheme,
+                            new ClaimsPrincipal(claimsIdentity),
+                            authProperties);
+
                         return RedirectToAction("Index", "Home");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Erro durante SignIn ou Redirecionamento: {ex.Message}");
+                        ModelState.AddModelError(string.Empty, "Ocorreu um erro inesperado durante o login. Tente novamente.");
+                        return View("~/Views/Account/Login.cshtml", model);
                     }
                 }
 
-                // Se o usuário não foi encontrado ou a senha está incorreta,
-                // a mensagem de erro é a mesma por segurança.
                 ModelState.AddModelError(string.Empty, "Email ou senha inválidos. Tente novamente.");
-                return View(model);
+                return View("~/Views/Account/Login.cshtml", model);
             }
 
-            // Se o ModelState não for válido, retorna para a mesma view
-            return View(model);
+            return View("~/Views/Account/Login.cshtml", model);
         }
     }
 }
