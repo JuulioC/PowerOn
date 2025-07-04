@@ -375,5 +375,38 @@ namespace PowerOn.Controllers
             // Retorna os bytes da imagem diretamente com o tipo MIME correto
             return File(usuario.ImgPerfil, usuario.ImgPerfilMimeType ?? "image/jpeg");
         }
+
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+                return Json(new { success = false, message = "Dados inválidos.", errors });
+            }
+
+            // Pega o ID do usuário logado a partir das Claims
+            var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdStr) || !int.TryParse(userIdStr, out var userId))
+            {
+                return Json(new { success = false, message = "Usuário não autenticado." });
+            }
+
+            var user = await _context.Usuarios.FindAsync(userId);
+            if (user == null)
+            {
+                return Json(new { success = false, message = "Usuário não encontrado." });
+            }
+
+            // Atualiza a senha
+            user.Senha = PasswordHasher.HashPassword(model.NewPassword); // Use seu método de hash
+            _context.Usuarios.Update(user);
+            await _context.SaveChangesAsync();
+
+            return Json(new { success = true, message = "Senha alterada com sucesso!" });
+        }
     }
 }
