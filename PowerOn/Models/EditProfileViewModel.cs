@@ -38,8 +38,7 @@ namespace PowerOn.Models
 
         public string? ImgPerfilBase64 { get; set; }
 
-        // *** MUDANÇA AQUI: Adicionada a propriedade ImgPerfilMimeType ***
-        public string? ImgPerfilMimeType { get; set; }
+        public string? ImgPerfilMimeType { get; set; } // Adicionada a propriedade ImgPerfilMimeType
 
         [Display(Name = "Nova Imagem de Perfil")]
         public IFormFile? NewProfileImageFile { get; set; }

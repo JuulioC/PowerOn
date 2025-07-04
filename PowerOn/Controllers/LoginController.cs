@@ -48,16 +48,6 @@ namespace PowerOn.Controllers
                         new Claim("CodigoSistema", usuario.CodigoSistema ?? "")
                     };
 
-                    // Lógica para a claim da imagem de perfil, garantindo que ela SEMPRE seja adicionada, mesmo que vazia.
-                    string imgBase64 = "";
-                    if (usuario.ImgPerfil != null && usuario.ImgPerfil.Length > 0)
-                    {
-                        imgBase64 = Convert.ToBase64String(usuario.ImgPerfil);
-                    }
-                    claims.Add(new Claim("ImgPerfilBase64", imgBase64));
-                    claims.Add(new Claim("ImgPerfilMimeType", usuario.ImgPerfilMimeType ?? ""));
-
-
                     var claimsIdentity = new ClaimsIdentity(
                         claims, CookieAuthenticationDefaults.AuthenticationScheme);
 

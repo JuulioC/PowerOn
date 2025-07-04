@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore; // Necessário para DbContext
 using PowerOn.Data; // Importa o namespace do seu DbContext
 using PowerOn.Models; // Importa o namespace dos seus modelos (Usuario, RegisterViewModel, EditProfileViewModel)
-using PowerOn.Utils; // Importa o namespace da sua classe PasswordHasher
+using PowerOn.Utils; // Importa o namespace da classe PasswordHasher
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -69,16 +69,15 @@ namespace PowerOn.Controllers
                     Ativo = 1, // Define o usuário como ativo por padrão
                     UltimoAcesso = DateTime.Now // Define a data do último acesso como agora
                     // ImgPerfil e ImgPerfilMimeType não são definidos aqui, pois é um upload separado ou padrão.
-                }
-            ;
+                };
 
-            // 3. Adiciona o novo usuário ao DbContext e salva no banco de dados
-            _context.Usuarios.Add(newUser);
-            await _context.SaveChangesAsync();
+                // 3. Adiciona o novo usuário ao DbContext e salva no banco de dados
+                _context.Usuarios.Add(newUser);
+                await _context.SaveChangesAsync();
 
-            // 4. Opcional: Autenticar o usuário automaticamente após o registro
-            // Isso evita que o usuário precise fazer login imediatamente após se cadastrar.
-            var claims = new List<Claim>
+                // 4. Opcional: Autenticar o usuário automaticamente após o registro
+                // Isso evita que o usuário precise fazer login imediatamente após se cadastrar.
+                var claims = new List<Claim>
                 {
                     new Claim(ClaimTypes.NameIdentifier, newUser.Id.ToString()),
                     new Claim(ClaimTypes.Name, newUser.Nome ?? newUser.Email),
@@ -87,32 +86,26 @@ namespace PowerOn.Controllers
                     new Claim("CodigoSistema", newUser.CodigoSistema ?? "")
                 };
 
-            string imgBase64 = "";
-            if (newUser.ImgPerfil != null && newUser.ImgPerfil.Length > 0)
-            {
-                imgBase64 = Convert.ToBase64String(newUser.ImgPerfil);
+                // As claims de imagem não são adicionadas aqui para evitar problemas de tamanho de cookie.
+                // A imagem será carregada sob demanda via o endpoint GetProfileImage.
+
+                var claimsIdentity = new ClaimsIdentity(
+                    claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+                var authProperties = new AuthenticationProperties
+                {
+                    IsPersistent = false,
+                    ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(30)
+                };
+
+                await HttpContext.SignInAsync(
+                    CookieAuthenticationDefaults.AuthenticationScheme,
+                    new ClaimsPrincipal(claimsIdentity),
+                    authProperties);
+
+                // Redireciona para uma página de sucesso ou para a página inicial
+                return RedirectToAction("RegistrationSuccess", "Account"); // Você pode criar esta View
             }
-            claims.Add(new Claim("ImgPerfilBase64", imgBase64));
-            claims.Add(new Claim("ImgPerfilMimeType", newUser.ImgPerfilMimeType ?? ""));
-
-
-            var claimsIdentity = new ClaimsIdentity(
-                claims, CookieAuthenticationDefaults.AuthenticationScheme);
-
-            var authProperties = new AuthenticationProperties
-            {
-                IsPersistent = false,
-                ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(30)
-            };
-
-            await HttpContext.SignInAsync(
-                CookieAuthenticationDefaults.AuthenticationScheme,
-                new ClaimsPrincipal(claimsIdentity),
-                authProperties);
-
-            // Redireciona para uma página de sucesso ou para a página inicial
-            return RedirectToAction("RegistrationSuccess", "Account"); // Você pode criar esta View
-        }
 
             // Se o ModelState não for válido, retorna para a View de cadastro com os erros
             return View(model);
@@ -165,11 +158,14 @@ namespace PowerOn.Controllers
                 // Senha e Confirmar Senha não são carregados aqui por segurança.
             };
 
+            // ImgPerfilBase64 e ImgPerfilMimeType não são passados diretamente para o ViewModel para exibição direta,
+            // porque a imagem será carregada via endpoint.
+            // No entanto, para a pré-visualização no formulário de edição, precisamos do Base64.
             if (usuario.ImgPerfil != null && usuario.ImgPerfil.Length > 0)
             {
                 model.ImgPerfilBase64 = Convert.ToBase64String(usuario.ImgPerfil);
+                model.ImgPerfilMimeType = usuario.ImgPerfilMimeType; // Passa o tipo MIME para o ViewModel para uso na View
             }
-            model.ImgPerfilMimeType = usuario.ImgPerfilMimeType; // Passa o tipo MIME da imagem para o ViewModel
 
 
             var userProfileClaim = User.FindFirst(ClaimTypes.Role)?.Value;
@@ -181,7 +177,7 @@ namespace PowerOn.Controllers
             ViewData["CurrentUserProfileId"] = currentUserProfileId;
 
 
-            return View(model); // Retorna a View Profile.cshtml com o modelo preenchido
+            return View(model);
         }
 
         // POST: /Account/Profile
@@ -191,18 +187,14 @@ namespace PowerOn.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Profile(EditProfileViewModel model)
         {
-            // Pega o ID do usuário logado novamente para garantir que ele está editando o próprio perfil
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             if (string.IsNullOrEmpty(userId) || model.Id != int.Parse(userId))
             {
-                // Se o ID não corresponder ou o usuário não estiver logado,
-                // é uma tentativa inválida, então desloga e redireciona.
                 await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
                 return RedirectToAction("Index", "Login");
             }
 
-            // Obtém o perfil do usuário logado a partir das Claims para verificar permissões
             var userProfileClaim = User.FindFirst(ClaimTypes.Role)?.Value;
             int currentUserProfileId = -1;
             if (int.TryParse(userProfileClaim, out int profileId))
@@ -212,20 +204,18 @@ namespace PowerOn.Controllers
             bool canEditRestrictedFields = currentUserProfileId == 0 || currentUserProfileId == 4;
 
 
-            // Remove as validações de senha se os campos estiverem vazios (não serão alterados)
             if (string.IsNullOrEmpty(model.NewPassword))
             {
                 ModelState.Remove(nameof(model.NewPassword));
                 ModelState.Remove(nameof(model.ConfirmNewPassword));
             }
 
-            // Busca o usuário no banco de dados ANTES da validação do modelo
             var usuarioToUpdate = await _context.Usuarios.FindAsync(model.Id);
 
             if (usuarioToUpdate == null)
             {
                 TempData["ErrorMessage"] = "Usuário não encontrado.";
-                // Recarrega a ImgPerfilBase64 e ImgPerfilMimeType para que a imagem atual seja exibida corretamente
+                // Recarrega ImgPerfilBase64 e ImgPerfilMimeType para que a imagem atual seja exibida corretamente
                 if (usuarioToUpdate != null && usuarioToUpdate.ImgPerfil != null && usuarioToUpdate.ImgPerfil.Length > 0)
                 {
                     model.ImgPerfilBase64 = Convert.ToBase64String(usuarioToUpdate.ImgPerfil);
@@ -236,7 +226,6 @@ namespace PowerOn.Controllers
 
             if (ModelState.IsValid)
             {
-                // Verifica se o email foi alterado e se o novo email já existe
                 if (usuarioToUpdate.Email != model.Email)
                 {
                     var existingUserWithNewEmail = await _context.Usuarios
@@ -244,7 +233,7 @@ namespace PowerOn.Controllers
                     if (existingUserWithNewEmail != null)
                     {
                         ModelState.AddModelError("Email", "Este email já está sendo usado por outro usuário.");
-                        // Recarrega a ImgPerfilBase64 e ImgPerfilMimeType para que a imagem atual seja exibida corretamente
+                        // Recarrega ImgPerfilBase64 e ImgPerfilMimeType para que a imagem atual seja exibida corretamente
                         if (usuarioToUpdate.ImgPerfil != null && usuarioToUpdate.ImgPerfil.Length > 0)
                         {
                             model.ImgPerfilBase64 = Convert.ToBase64String(usuarioToUpdate.ImgPerfil);
@@ -254,11 +243,9 @@ namespace PowerOn.Controllers
                     }
                 }
 
-                // Atualiza as propriedades editáveis por todos
                 usuarioToUpdate.Nome = model.Nome;
                 usuarioToUpdate.Email = model.Email;
 
-                // Lógica para alteração de senha (se o usuário preencheu os campos de senha)
                 if (!string.IsNullOrEmpty(model.NewPassword))
                 {
                     usuarioToUpdate.Senha = PasswordHasher.HashPassword(model.NewPassword);
@@ -276,10 +263,9 @@ namespace PowerOn.Controllers
                 }
                 else if (model.ImgPerfilBase64 == null && usuarioToUpdate.ImgPerfil != null)
                 {
-                    // Caso o usuário remova a imagem (se você adicionar essa funcionalidade na View)
-                    // Ou se a imagem estava lá e não foi alterada, mas o ImgPerfilBase64 veio nulo
-                    // Por enquanto, se NewProfileImageFile é nulo, mantemos a imagem existente
-                    // Se você quiser permitir "remover imagem", precisaria de um checkbox na View
+                    // Lógica para remover a imagem se for o caso (não implementado na View ainda)
+                    // usuarioToUpdate.ImgPerfil = null;
+                    // usuarioToUpdate.ImgPerfilMimeType = null;
                 }
 
 
@@ -287,12 +273,11 @@ namespace PowerOn.Controllers
                 {
                     usuarioToUpdate.Perfil = model.Perfil;
                     usuarioToUpdate.EmpresaId = model.EmpresaId;
-                    usuarioToUpdate.CodigoSistema = model.CodigoSistema; // MAXMOBILITY/ISOTECH podem editar CodigoSistema
+                    usuarioToUpdate.CodigoSistema = model.CodigoSistema;
                 }
-                else // Para outros perfis (CONSULTOR, GERENTE, ADMINISTRADOR, DESCONHECIDO)
+                else
                 {
-                    // NÃO ATUALIZA Perfil, EmpresaId, CodigoSistema se o usuário não tem permissão.
-                    // Os valores originais do usuarioToUpdate serão mantidos para esses campos.
+                    // Não atualiza Perfil, EmpresaId, CodigoSistema se o usuário não tem permissão.
                 }
 
 
@@ -311,13 +296,8 @@ namespace PowerOn.Controllers
                     new Claim("EmpresaId", usuarioToUpdate.EmpresaId.ToString()),
                     new Claim("CodigoSistema", usuarioToUpdate.CodigoSistema ?? "")
                 };
-                string imgBase64 = "";
-                if (usuarioToUpdate.ImgPerfil != null && usuarioToUpdate.ImgPerfil.Length > 0)
-                {
-                    imgBase64 = Convert.ToBase64String(usuarioToUpdate.ImgPerfil);
-                }
-                claims.Add(new Claim("ImgPerfilBase64", imgBase64));
-                claims.Add(new Claim("ImgPerfilMimeType", usuarioToUpdate.ImgPerfilMimeType ?? ""));
+                // As claims de imagem não são adicionadas ao cookie de autenticação.
+                // Elas serão carregadas sob demanda pelo endpoint GetProfileImage.
 
 
                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -350,6 +330,50 @@ namespace PowerOn.Controllers
             Response.Headers["Expires"] = "0";
 
             return Redirect("/Login");
+        }
+
+        // NOVO ENDPOINT: Para servir a imagem de perfil diretamente
+        [HttpGet]
+        [AllowAnonymous] // Pode ser acessado por qualquer um que tenha a URL
+        public async Task<IActionResult> GetProfileImage(int userId)
+        {
+            var usuario = await _context.Usuarios.FindAsync(userId);
+
+            if (usuario == null || usuario.ImgPerfil == null || usuario.ImgPerfil.Length == 0)
+            {
+                // Retorna uma imagem padrão se o usuário não for encontrado ou não tiver imagem
+                // Você pode servir um arquivo estático aqui
+                return File("~/assets/images/UserImage.png", "image/png");
+            }
+
+            // Retorna a imagem como um FileContentResult com o tipo MIME correto
+            return File(usuario.ImgPerfil, usuario.ImgPerfilMimeType ?? "image/jpeg"); // Fallback para image/jpeg se MIME Type for nulo
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ProfileImage()
+        {
+            // Pega o ID do usuário logado a partir das claims do cookie
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+            {
+                return NotFound();
+            }
+
+            var usuario = await _context.Usuarios
+                                        .AsNoTracking() // Melhora a performance para consultas de apenas leitura
+                                        .FirstOrDefaultAsync(u => u.Id == int.Parse(userId));
+
+            if (usuario?.ImgPerfil == null || usuario.ImgPerfil.Length == 0)
+            {
+                // Opcional: retorne uma imagem padrão caso o usuário não tenha uma.
+                // var defaultImagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images", "default-avatar.png");
+                // return PhysicalFile(defaultImagePath, "image/png");
+                return NotFound(); // Ou retorne um status 404
+            }
+
+            // Retorna os bytes da imagem diretamente com o tipo MIME correto
+            return File(usuario.ImgPerfil, usuario.ImgPerfilMimeType ?? "image/jpeg");
         }
     }
 }
