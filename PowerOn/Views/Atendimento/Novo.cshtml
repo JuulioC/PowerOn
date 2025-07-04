@@ -1,0 +1,591 @@
+﻿@{
+    ViewData["Title"] = "Novo Atendimento";
+    // O Layout já é definido globalmente, mas podemos garantir aqui se necessário.
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="card">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="page-title mb-0">
+                <span class="page-title-icon bg-gradient-primary text-white me-2">
+                    <i class="fas fa-clipboard-list"></i>
+                </span>
+                Atendimento
+            </h3>
+        </div>
+        <div class="wizard-header mb-4">
+            <ul class="nav nav-pills nav-fill" id="atendimento-wizard" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link active" id="step1-tab" data-bs-toggle="pill" href="#step1-pane" role="tab" aria-controls="step1-pane" aria-selected="true">
+                        <i class="fas fa-user-check me-2"></i>
+                        1. Cliente e Veículo
+                    </a>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link disabled" id="step2-tab" data-bs-toggle="pill" href="#step2-pane" role="tab" aria-controls="step2-pane" aria-selected="false">
+                        <i class="fas fa-clipboard-list me-2"></i>
+                        2. Checklist
+                    </a>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link disabled" id="step3-tab" data-bs-toggle="pill" href="#step3-pane" role="tab" aria-controls="step3-pane" aria-selected="false">
+                        <i class="fas fa-box-open me-2"></i>
+                        3. Pacotes e Serviços
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <hr />
+
+        <div class="tab-content" id="atendimento-wizard-content">
+
+            <div class="tab-pane fade show active" id="step1-pane" role="tabpanel" aria-labelledby="step1-tab">
+                <h4 class="card-title">1. Confirmação de Dados</h4>
+                <div class="row align-items-end p-3 mb-4 bg-light rounded border">
+                    <div class="col-md-10">
+                        <label for="busca-geral" class="form-label">Buscar Cliente ou Veículo</label>
+                        <input type="text" id="busca-geral" class="form-control" placeholder="Digite o CPF, CNPJ ou Placa...">
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-gradient-primary w-100" id="btn-buscar-cliente"><i class="fas fa-search me-2"></i>Buscar</button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-header"><h5 class="mb-0">Dados do Cliente</h5></div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-12 form-group"><label>Nome Completo</label><input type="text" class="form-control" name="Cliente.Nome" readonly></div>
+                                    <div class="col-md-6 form-group"><label>CPF / CNPJ</label><input type="text" class="form-control" name="Cliente.Documento" readonly></div>
+                                    <div class="col-md-6 form-group"><label>Email</label><input type="email" class="form-control" name="Cliente.Email" readonly></div>
+                                    <div class="col-md-6 form-group"><label>Telefone 1</label><input type="text" class="form-control" name="Cliente.Telefone1" readonly></div>
+                                    <div class="col-md-6 form-group"><label>Telefone 2</label><input type="text" class="form-control" name="Cliente.Telefone2" readonly></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-header"><h5 class="mb-0">Dados do Veículo</h5></div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6 form-group"><label>Veículos Cadastrados</label><select class="form-select" name="Veiculo.Id" disabled><option>Selecione...</option></select></div>
+                                    <div class="col-md-6 form-group"><label>Placa</label><input type="text" class="form-control" name="Veiculo.Placa" readonly></div>
+                                    <div class="col-md-6 form-group"><label>Marca</label><input type="text" class="form-control" name="Veiculo.Marca" readonly></div>
+                                    <div class="col-md-6 form-group"><label>Modelo</label><input type="text" class="form-control" name="Veiculo.Modelo" readonly></div>
+                                    <div class="col-md-6 form-group"><label>Ano/Modelo</label><input type="text" class="form-control" name="Veiculo.Ano" readonly></div>
+                                    <div class="col-md-6 form-group"><label>KM Atual</label><input type="number" class="form-control" name="Veiculo.KmAtual" readonly></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-end mt-4">
+                    <button class="btn btn-primary" id="btn-next-step1" disabled>Próximo <i class="fas fa-arrow-right ms-2"></i></button>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="step2-pane" role="tabpanel" aria-labelledby="step2-tab">
+                <h4 class="card-title">2. Checklist de Entrada</h4>
+                <p class="card-description">Verifique os itens do veículo e registre as condições de entrada.</p>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">Acessórios Presentes</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-2">
+
+                                    <div class="col-4">
+                                        <input type="checkbox" class="btn-check" id="chk-estepe" autocomplete="off">
+                                        <label class="btn btn-outline-primary w-100" for="chk-estepe">Estepe</label>
+                                    </div>
+                                    <div class="col-4">
+                                        <input type="checkbox" class="btn-check" id="chk-macaco" autocomplete="off">
+                                        <label class="btn btn-outline-primary w-100" for="chk-macaco">Macaco</label>
+                                    </div>
+                                    <div class="col-4">
+                                        <input type="checkbox" class="btn-check" id="chk-chave-roda" autocomplete="off">
+                                        <label class="btn btn-outline-primary w-100" for="chk-chave-roda">Chave de Roda</label>
+                                    </div>
+
+                                    <div class="col-4">
+                                        <input type="checkbox" class="btn-check" id="chk-triangulo" autocomplete="off">
+                                        <label class="btn btn-outline-primary w-100" for="chk-triangulo">Triângulo</label>
+                                    </div>
+                                    <div class="col-4">
+                                        <input type="checkbox" class="btn-check" id="chk-radio" autocomplete="off">
+                                        <label class="btn btn-outline-primary w-100" for="chk-radio">Rádio/Multimídia</label>
+                                    </div>
+                                    <div class="col-4">
+                                        <input type="checkbox" class="btn-check" id="chk-tapetes" autocomplete="off">
+                                        <label class="btn btn-outline-primary w-100" for="chk-tapetes">Tapetes</label>
+                                    </div>
+
+                                    <div class="col-4">
+                                        <input type="checkbox" class="btn-check" id="chk-manuais" autocomplete="off">
+                                        <label class="btn btn-outline-primary w-100" for="chk-manuais">Manuais</label>
+                                    </div>
+                                    <div class="col-4">
+                                        <input type="checkbox" class="btn-check" id="chk-extintor" autocomplete="off">
+                                        <label class="btn btn-outline-primary w-100" for="chk-extintor">Extintor</label>
+                                    </div>
+                                    <div class="col-4">
+                                        <input type="checkbox" class="btn-check" id="chk-antena" autocomplete="off">
+                                        <label class="btn btn-outline-primary w-100" for="chk-antena">Antena</label>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-header"><h5 class="mb-0">Níveis e Condições</h5></div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6 form-group"><label>Nível de Combustível</label><input type="range" class="form-range" min="0" max="4" step="1"></div>
+                                    <div class="col-md-6 form-group"><label>Nível do Óleo</label><select class="form-select"><option>OK</option><option>Baixo</option></select></div>
+                                    <div class="col-md-6 form-group"><label>Água do Radiador</label><select class="form-select"><option>OK</option><option>Baixo</option></select></div>
+                                    <div class="col-md-6 form-group"><label>Fluido de Freio</label><select class="form-select"><option>OK</option><option>Baixo</option></select></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm">
+                    <div class="card-header"><h5 class="mb-0">Registro de Avarias</h5></div>
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-12 text-center">
+                                <img src="~/assets/images/checklist/CheckList_Teste.jpg" alt="Diagrama do veículo" class="img-fluid" />
+                            </div>
+                        </div>
+                        <div class="row text-center">
+                            <small class="text-muted">Use a imagem como referência para descrever as avarias.</small>
+                        </div>
+                        <div class="row mt-5">
+                            <div class="col-md-12 form-group">
+                                <label>Descreva as avarias (riscos, amassados, etc.)</label>
+                                <textarea class="form-control" rows="8" placeholder="Ex: Risco profundo na porta do motorista. Amassado no para-choque traseiro."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between mt-4">
+                    <button class="btn btn-secondary" id="btn-prev-step2"><i class="fas fa-arrow-left me-2"></i>Voltar</button>
+                    <button class="btn btn-primary" id="btn-next-step2">Próximo <i class="fas fa-arrow-right ms-2"></i></button>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="step3-pane" role="tabpanel" aria-labelledby="step3-tab">
+                <h4 class="card-title">3. Seleção de Pacotes e Serviços</h4>
+                <p class="card-description">Escolha um dos pacotes de revisão ou adicione serviços avulsos.</p>
+
+                <div class="row">
+                    <div class="col-lg-4 d-flex align-items-stretch mb-4">
+                        <div id="pacote-essencial" class="card package-card text-center w-100">
+                            <div class="card-header package-header-essencial"><h5 class="mb-0">ESSENCIAL</h5></div>
+                            <div class="card-body d-flex flex-column">
+                                <h3 class="price" data-price-text="3x de|R$ 861,90">3x de <strong>R$ 861,90</strong></h3>
+                                <a href="#" class="payment-options" data-bs-toggle="popover" title="Opções de Pagamento">ver opções de pagamento</a>
+                                <hr />
+                                <div class="text-start flex-grow-1">
+                                    <h6>ITENS PRECONIZADOS</h6>
+                                    <ul class="list-unstyled">
+                                        <li class="form-check"><input type="checkbox" class="form-check-input" checked disabled> FILTRO DE AR</li>
+                                        <li class="form-check"><input type="checkbox" class="form-check-input" checked disabled> FILTRO ÓLEO</li>
+                                    </ul>
+                                    <hr />
+                                    <h6 class="mt-3">ITENS AGREGADOS</h6>
+                                    <ul class="list-unstyled aggregated-items">
+                                        <li class="form-check"><input type="checkbox" class="form-check-input"> Limpeza do Sistema de Ar</li>
+                                    </ul>
+                                </div>
+                                <div class="subtotal mt-3">Sub-total: <strong>R$ 2.585,70</strong></div>
+                            </div>
+                            <div class="card-footer package-footer">
+                                <div class="btn-group w-100" role="group">
+                                    <button class="btn btn-sm btn-outline-primary btn-add-item" data-bs-toggle="modal" data-bs-target="#addExtraItemModal">Add Serviço/Peça</button>
+                                    <button class="btn btn-sm btn-primary btn-contratar">Contratar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 d-flex align-items-stretch mb-4">
+                        <div id="pacote-intermediario" class="card package-card text-center w-100">
+                            <div class="card-header package-header-intermediario"><h5 class="mb-0">INTERMEDIÁRIO</h5></div>
+                            <div class="card-body d-flex flex-column">
+                                <h3 class="price" data-price-text="4x de|R$ 661,42">4x de <strong>R$ 661,42</strong></h3>
+                                <a href="#" class="payment-options" data-bs-toggle="popover" title="Opções de Pagamento">ver opções de pagamento</a>
+                                <hr />
+                                <div class="text-start flex-grow-1">
+                                    <h6>ITENS PRECONIZADOS</h6>
+                                    <ul class="list-unstyled">
+                                        <li class="form-check"><input type="checkbox" class="form-check-input" checked disabled> FILTRO DE AR</li>
+                                    </ul>
+                                    <hr />
+                                    <h6 class="mt-3">ITENS AGREGADOS</h6>
+                                    <ul class="list-unstyled aggregated-items">
+                                        <li class="form-check"><input type="checkbox" class="form-check-input"> Cristalizador de vidros</li>
+                                    </ul>
+                                </div>
+                                <div class="subtotal mt-3">Sub-total: <strong>R$ 2.645,68</strong></div>
+                            </div>
+                            <div class="card-footer package-footer">
+                                <div class="btn-group w-100" role="group">
+                                    <button class="btn btn-sm btn-outline-primary btn-add-item" data-bs-toggle="modal" data-bs-target="#addExtraItemModal">Add Serviço/Peça</button>
+                                    <button class="btn btn-sm btn-primary btn-contratar">Contratar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 d-flex align-items-stretch mb-4">
+                        <div id="pacote-completo" class="card package-card text-center w-100">
+                            <div class="card-header package-header-completo"><h5 class="mb-0">COMPLETO</h5></div>
+                            <div class="card-body d-flex flex-column">
+                                <h3 class="price" data-price-text="8x de|R$ 452,22">8x de <strong>R$ 452,22</strong></h3>
+                                <a href="#" class="payment-options" data-bs-toggle="popover" title="Opções de Pagamento">ver opções de pagamento</a>
+                                <hr />
+                                <div class="text-start flex-grow-1">
+                                    <h6>ITENS PRECONIZADOS</h6>
+                                    <ul class="list-unstyled">
+                                        <li class="form-check"><input type="checkbox" class="form-check-input" checked disabled> FILTRO DE AR</li>
+                                        <li class="form-check"><input type="checkbox" class="form-check-input" checked disabled> VELA BOSCH IRIDIUM</li>
+                                    </ul>
+                                    <hr />
+                                    <h6 class="mt-3">ITENS AGREGADOS</h6>
+                                    <ul class="list-unstyled aggregated-items">
+                                        <li class="form-check"><input type="checkbox" class="form-check-input"> Limpeza do TBI</li>
+                                    </ul>
+                                </div>
+                                <div class="subtotal mt-3">Sub-total: <strong>R$ 3.617,76</strong></div>
+                            </div>
+                            <div class="card-footer package-footer">
+                                <div class="btn-group w-100" role="group">
+                                    <button class="btn btn-sm btn-outline-primary btn-add-item" data-bs-toggle="modal" data-bs-target="#addExtraItemModal">Add Serviço/Peça</button>
+                                    <button class="btn btn-sm btn-primary btn-contratar">Contratar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between mt-4">
+                    <button class="btn btn-secondary" id="btn-prev-step3"><i class="fas fa-arrow-left me-2"></i>Voltar</button>
+                    <button class="btn btn-success btn-lg" id="btn-finalizar"><i class="fas fa-check-circle me-2"></i>Finalizar e Gerar OS</button>
+                </div>
+            </div>
+
+
+            <div class="modal fade" id="addExtraItemModal" tabindex="-1" aria-labelledby="addExtraItemModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-sm">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addExtraItemModalLabel">Adicionar Novo Item</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="form-add-item">
+                                <div class="row align-items-end">
+                                    <div class="col-md-4 form-group">
+                                        <label class="form-label">Tipo</label>
+                                        <select class="form-select">
+                                            <option selected>Peça</option>
+                                            <option>Serviço</option>
+                                            <option>Kit</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 form-group">
+                                        <label class="form-label">Digite o Código do Item</label>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" placeholder="Código ERP...">
+                                            <button class="btn btn-outline-secondary" type="button"><i class="fas fa-search"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <hr />
+                                <div class="row">
+                                    <div class="col-md-12 form-group">
+                                        <label class="form-label">Nome</label>
+                                        <input type="text" class="form-control" readonly id="modal-item-nome" value="Óleo de Motor 5W30 Sintético">
+                                    </div>
+                                    <div class="col-md-4 form-group">
+                                        <label class="form-label">Quantidade</label>
+                                        <input type="number" class="form-control" value="1">
+                                    </div>
+                                    <div class="col-md-4 form-group">
+                                        <label class="form-label">Valor Unitário</label>
+                                        <input type="text" class="form-control" readonly value="R$ 85,00">
+                                    </div>
+                                    <div class="col-md-4 form-group">
+                                        <label class="form-label">Valor Total</label>
+                                        <input type="text" class="form-control" readonly value="R$ 85,00">
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="button" class="btn btn-primary" id="btn-save-extra-item">Salvar Item</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .wizard-header .nav-link {
+            color: #6c757d;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2d6;
+            margin: 0 5px;
+            border-radius: 5px;
+        }
+
+            .wizard-header .nav-link.active {
+                color: #fff;
+                background-color: #9a55ff;
+                font-weight: bold;
+                border-color: #9a55ff;
+            }
+
+            .wizard-header .nav-link.disabled {
+                color: #adb5bd;
+                background-color: #e9ecef;
+                pointer-events: none;
+            }
+
+        .package-card {
+            border: 2px solid #e9ecef;
+            transition: all 0.2s ease-in-out;
+        }
+
+            .package-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
+            }
+
+            .package-card.selected {
+                border: 3px solid #198754;
+                box-shadow: 0 0 15px rgba(25, 135, 84, 0.5);
+            }
+
+            .package-card .card-header {
+                color: #fff;
+                font-weight: bold;
+                text-transform: uppercase;
+            }
+
+        .package-header-essencial {
+            background-color: #fdab73;
+        }
+
+        .package-header-intermediario {
+            background-color: #4dd599;
+        }
+
+        .package-header-completo {
+            background-color: #5582ff;
+        }
+
+        .package-card .price {
+            font-size: 1.5rem;
+            color: #343a40;
+        }
+
+            .package-card .price strong {
+                font-size: 2.2rem;
+            }
+
+        .package-card .payment-options {
+            font-size: 0.8rem;
+            text-decoration: none;
+        }
+
+        .package-card .list-unstyled li {
+            padding: 4px 0;
+        }
+
+        .package-card .subtotal {
+            font-size: 1.1rem;
+        }
+
+        .package-footer {
+            background-color: #f8f9fa;
+            border-top: 1px solid #dee2d6;
+        }
+
+        .package-card {
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease-in-out; /* Transição suave */
+            box-shadow: 0 .125rem .25rem rgba(0,0,0,.075);
+        }
+
+            /* Efeito ao passar o mouse por cima */
+            .package-card:not(.selected):hover {
+                transform: translateY(-5px); /* Eleva o card */
+                border-color: #c3a5ff; /* Borda com a cor primária mais clara */
+                box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
+            }
+
+            /* Efeito ao selecionar o card */
+            .package-card.selected {
+                transform: translateY(-5px);
+                border: 3px solid #9a55ff; /* Borda primária mais grossa */
+                box-shadow: 0 0 20px rgba(154, 85, 255, 0.5); /* Sombra colorida */
+            }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // =======================================================
+            //  1. REFERÊNCIAS AOS ELEMENTOS DO WIZARD
+            // =======================================================
+            const step1TabEl = document.querySelector('#step1-tab');
+            const step2TabEl = document.querySelector('#step2-tab');
+            const step3TabEl = document.querySelector('#step3-tab');
+
+            // Botões de Navegação
+            const btnBuscarCliente = document.getElementById('btn-buscar-cliente');
+            const btnNext1 = document.getElementById('btn-next-step1');
+            const btnPrev2 = document.getElementById('btn-prev-step2');
+            const btnNext2 = document.getElementById('btn-next-step2');
+            const btnPrev3 = document.getElementById('btn-prev-step3');
+
+            // Instâncias das abas do Bootstrap para controle via JS
+            const step1Tab = new bootstrap.Tab(step1TabEl);
+            const step2Tab = new bootstrap.Tab(step2TabEl);
+            const step3Tab = new bootstrap.Tab(step3TabEl);
+
+
+            // =======================================================
+            //  2. LÓGICA DE NAVEGAÇÃO DO WIZARD
+            // =======================================================
+
+            // Avançar da Etapa 1 para a 2
+            btnNext1.addEventListener('click', function () {
+                step2TabEl.classList.remove('disabled');
+                step2Tab.show();
+            });
+
+            // Voltar da Etapa 2 para a 1
+            btnPrev2.addEventListener('click', function () {
+                step1Tab.show();
+            });
+
+            // Avançar da Etapa 2 para a 3
+            btnNext2.addEventListener('click', function () {
+                step3TabEl.classList.remove('disabled');
+                step3Tab.show();
+            });
+
+            // Voltar da Etapa 3 para a 2
+            btnPrev3.addEventListener('click', function () {
+                step2Tab.show();
+            });
+
+
+            // =======================================================
+            //  3. LÓGICA ESPECÍFICA DE CADA ETAPA
+            // =======================================================
+
+            // --- LÓGICA DA ETAPA 1: Busca de Cliente (SIMULAÇÃO) ---
+            btnBuscarCliente.addEventListener('click', function() {
+                // No futuro, aqui entrará a chamada AJAX para o Controller
+                console.log('Buscando cliente...');
+
+                // Simulação: Após a busca, habilitamos o botão "Próximo"
+                alert('Busca simulada! Cliente encontrado. O botão "Próximo" foi habilitado.');
+                btnNext1.disabled = false;
+            });
+
+
+            // --- LÓGICA DA ETAPA 3: Pacotes, Popover e Modal ---
+            let currentTargetCardId = null;
+
+            // Lógica do Popover de Pagamento
+            const popoverContent = `
+                <div class="list-group list-group-flush payment-popover">
+                    <a href="#" class="list-group-item list-group-item-action" data-text="1x de|R$ 2.585,70">À vista <strong>R$ 2.585,70</strong></a>
+                    <a href="#" class="list-group-item list-group-item-action" data-text="3x de|R$ 861,90">3x de R$ 861,90</a>
+                    <a href="#" class="list-group-item list-group-item-action" data-text="6x de|R$ 430,95">6x de R$ 430,95</a>
+                </div>`;
+
+            const popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+            const popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+                return new bootstrap.Popover(popoverTriggerEl, {
+                    html: true,
+                    content: popoverContent,
+                    sanitize: false
+                });
+            });
+
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('.payment-popover a')) {
+                    e.preventDefault();
+                    const link = e.target.closest('a');
+                    const newText = link.dataset.text.split('|');
+                    const card = link.closest('.package-card');
+                    if (card) {
+                        const priceEl = card.querySelector('.price');
+                        priceEl.innerHTML = `${newText[0]} <strong>${newText[1]}</strong>`;
+                    }
+                    popoverList.forEach(p => p.hide());
+                }
+            });
+
+            // Lógica do Modal "Add Serviço/Peça"
+            document.querySelectorAll('.btn-add-item').forEach(button => {
+                button.addEventListener('click', function() {
+                    currentTargetCardId = this.closest('.package-card').id;
+                });
+            });
+
+            document.getElementById('btn-save-extra-item').addEventListener('click', function() {
+                if(currentTargetCardId) {
+                    const itemName = document.getElementById('modal-item-nome').value || "Item Extra";
+                    const targetList = document.querySelector(`#${currentTargetCardId} .aggregated-items`);
+                    if(targetList){
+                        const newItemLi = document.createElement('li');
+                        newItemLi.className = 'form-check';
+                        newItemLi.innerHTML = `<input type="checkbox" class="form-check-input" checked> ${itemName}`;
+                        targetList.appendChild(newItemLi);
+                    }
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('addExtraItemModal'));
+                    modal.hide();
+                    document.getElementById('form-add-item').reset();
+                }
+            });
+
+             // Lógica para selecionar o pacote
+            document.querySelectorAll('.btn-contratar').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    document.querySelectorAll('.package-card').forEach(card => card.classList.remove('selected'));
+                    const selectedCard = this.closest('.package-card');
+                    selectedCard.classList.add('selected');
+                });
+            });
+
+        });
+    </script>
+}

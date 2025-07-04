@@ -1,13 +1,4 @@
-﻿@* @{
-    ViewData["Title"] = "Página Inicial";
-}
-
-<div class="text-center">
-    <h1 class="display-4">Bem-vindo ao PowerOn!</h1>
-    <p>Sua aplicação está funcionando com o layout.</p>
-</div> *@
-
-@{
+﻿@{
     ViewData["Title"] = "Agenda";
 }
 
@@ -24,36 +15,43 @@
                     </h3>
                 </div>
                 <hr class="my-4">
+
                 <form asp-action="Index" asp-controller="Home" method="get">
                     <div class="row align-items-end">
                         <div class="col-md-5">
                             <div class="form-group">
                                 <label for="data-agendamento">Data</label>
-                                <input type="text" class="form-control" id="data-agendamento" name="DataAgendamento">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="data-agendamento" name="DataAgendamento" data-provide="datepicker" data-date-language="pt-BR" data-date-autoclose="true" data-date-format="dd/mm/yyyy" placeholder="Selecione a data">
+                                    <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-5">
                             <div class="form-group">
                                 <label for="nome-consultor">Consultor</label>
-                                <input type="text" class="form-control" id="nome-consultor" value="@ViewData["NomeConsultor"]" disabled>
+                                <input type="text" class="form-control" id="nome-consultor" value="@ViewData["NomeConsultor"]" readonly>
                             </div>
                         </div>
                         <div class="col-md-2">
                             <div class="form-group">
-                                <label class="text-white" style="visibility: hidden;">Buscar</label>
                                 <button type="submit" class="btn btn-gradient-primary w-100">Buscar</button>
                             </div>
                         </div>
                     </div>
                 </form>
                 <hr class="my-4">
+
                 <h4 class="card-title">Agendamentos</h4>
                 <div class="table-responsive">
                     <table class="table table-hover">
                         <thead>
                             <tr>
+                                <th>Horário</th>
                                 <th>Cliente</th>
                                 <th>Placa</th>
+                                <th>Modelo</th>
+                                <th>Obs.</th>
                                 <th>Status</th>
                                 <th>Consultor</th>
                                 <th class="text-end">Atendimento</th>
@@ -61,22 +59,35 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td>Eren Yeagger</td>
+                                <td>08:00</td>
+                                <td>Eren Yeager</td>
                                 <td>ABC-1234</td>
+                                <td>Toyota Hilux</td>
                                 <td>
-                                    <label class="badge badge-gradient-success">CONFIRMADO</label>
+                                    <a tabindex="0"
+                                       class="text-info"
+                                       role="button"
+                                       data-bs-toggle="popover"
+                                       data-bs-trigger="hover focus"
+                                       title="Observação"
+                                       data-bs-content="Cliente relatou um barulho estranho na suspensão dianteira direita ao passar por quebra-molas. Verificar com atenção.">
+                                        <i class="fas fa-circle-info fa-lg"></i>
+                                    </a>
                                 </td>
+                                <td><label class="badge badge-gradient-success">CONFIRMADO</label></td>
                                 <td>Felippe T.</td>
                                 <td class="text-end">
                                     <a asp-controller="OrdemServico" asp-action="Detalhes" asp-route-id="123">OS-54321</a>
                                 </td>
-                            </tr>                            
+                            </tr>
                             <tr>
+                                <td>09:00</td>
                                 <td>Stella Johnson</td>
                                 <td>XYZ-8899</td>
+                                <td>Honda Civic</td>
                                 <td>
-                                    <label class="badge badge-gradient-warning">PENDENTE</label>
                                 </td>
+                                <td><label class="badge badge-gradient-warning">PENDENTE</label></td>
                                 <td>Consultor E.</td>
                                 <td class="text-end">
                                     <a asp-controller="OrdemServico" asp-action="Create" asp-route-agendamentoId="456" class="btn btn-sm btn-gradient-primary">
@@ -91,19 +102,38 @@
         </div>
     </div>
 </div>
+
 @section Scripts {
     <script>
-        $(document).ready(function(){
+        $(document).ready(function () {
 
+            // 1. Inicializa os popovers para as observações
+            var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+            var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+                return new bootstrap.Popover(popoverTriggerEl);
+            });
+
+            // 2. Aplica a máscara de data
             $('#data-agendamento').mask('00/00/0000');
 
-            var hoje = new Date();
-            var dia = String(hoje.getDate()).padStart(2, '0');
-            var mes = String(hoje.getMonth() + 1).padStart(2, '0');
-            var ano = hoje.getFullYear();
-            var dataFormatada = dia + '/' + mes + '/' + ano;
+            // 3. Define a data atual no campo de data, se estiver vazio
+            // O Datepicker irá pegar este valor automaticamente.
+            if (!$('#data-agendamento').val()) {
+                var hoje = new Date();
+                var dia = String(hoje.getDate()).padStart(2, '0');
+                var mes = String(hoje.getMonth() + 1).padStart(2, '0');
+                var ano = hoje.getFullYear();
+                var dataFormatada = dia + '/' + mes + '/' + ano;
+                $('#data-agendamento').val(dataFormatada);
+            }
 
-            $('#data-agendamento').val(dataFormatada);
+            // O Bootstrap Datepicker é inicializado automaticamente pelos atributos 'data-provide="datepicker"' no HTML.
+            // Se precisar de configurações mais avançadas, você pode inicializar manualmente aqui:
+            // $('#data-agendamento').datepicker({
+            //     language: 'pt-BR',
+            //     autoclose: true,
+            //     todayHighlight: true
+            // });
         });
     </script>
 }
